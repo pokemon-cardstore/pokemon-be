@@ -27,5 +27,9 @@ namespace Repository.Repository.Interface
         Task UpdateAsync(TEntity entityToUpdate);
 
         Task<int> CountAsync(Expression<Func<TEntity, bool>> filter = null);
+
+        TEntity Add(TEntity entity);
+
+        Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> expression);
     }
 }

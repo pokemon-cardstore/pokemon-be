@@ -107,5 +107,16 @@ namespace Repository.Repository.Implement
 
             return await query.CountAsync();
         }
+
+        public TEntity Add(TEntity entity)
+        {
+            dbSet.Add(entity);
+            return entity;
+        }
+
+        public async Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> expression)
+        {
+            return await dbSet.FirstOrDefaultAsync(expression);
+        }
     }
 }
