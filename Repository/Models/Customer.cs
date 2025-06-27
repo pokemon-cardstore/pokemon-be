@@ -13,7 +13,7 @@ namespace Repository.Models
 
         public int CustomerId { get; set; }
         public string Email { get; set; } = null!;
-        public string HashedPassword { get; set; } = null!;
+        public string? HashedPassword { get; set;}
         public int Status { get; set; }
         public string? Name { get; set; }
         public string? Address { get; set; }

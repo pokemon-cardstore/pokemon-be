@@ -84,5 +84,42 @@ namespace Services.Services.Implement
                 throw new Exception(ex.Message);
             }
         }
+        public async Task<Customer> GetCustomerByEmail(string email)
+        {
+            try
+            {
+                var customer = (await _unitOfWork.CustomerRepository.FindAsync(c => c.Email == email)).FirstOrDefault();
+                return customer;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error fetching customer by email: {ex.Message}");
+            }
+        }
+        public async Task<Customer> CreateCustomerFromGoogle(string email, string name, string avatarUrl)
+        {
+            try
+            {
+                var newCustomer = new Customer
+                {
+                    Email = email,
+                    Name = name,
+                    Avatar = avatarUrl,
+                    HashedPassword = null,
+                    Status = 1
+                };
+
+                await _unitOfWork.CustomerRepository.InsertAsync(newCustomer);
+                await _unitOfWork.SaveAsync();
+
+                return newCustomer;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error creating customer from Google: {ex.Message}");
+            }
+        }
+
+
     }
 }

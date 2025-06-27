@@ -13,5 +13,8 @@ namespace Services.Services.Interface
 
         Task<string> GenerateAccessTokenForCustomer(Customer customer);
         Task<string> GenerateAccessTokenForAdmin();
+        Task<Customer> GetCustomerByEmail(string email);
+        Task<Customer> CreateCustomerFromGoogle(string email, string name, string avatarUrl);
+
     }
 }
