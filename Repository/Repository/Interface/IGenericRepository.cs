@@ -14,6 +14,7 @@ namespace Repository.Repository.Interface
            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
            string includeProperties = "", int? pageIndex = null, int? pageSize = null);
 
+        Task<IEnumerable<TEntity>> GetAllAsync();
         Task<TEntity> GetByIDAsync(object id);
 
         Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> expression);

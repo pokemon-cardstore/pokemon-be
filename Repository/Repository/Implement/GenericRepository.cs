@@ -118,5 +118,10 @@ namespace Repository.Repository.Implement
         {
             return await dbSet.FirstOrDefaultAsync(expression);
         }
+
+        public async Task<IEnumerable<TEntity>> GetAllAsync()
+        {
+            return await dbSet.ToListAsync();
+        }
     }
 }

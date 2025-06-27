@@ -55,6 +55,15 @@ namespace Services.Services.Implement
             return Task.CompletedTask;
         }
 
+        private async Task ConnectAndSendEmailAsync(MailKit.Net.Smtp.SmtpClient smtpClient, MimeMessage message)
+        {
+            // Use configuration values from appsettings.json
+            await smtpClient.ConnectAsync(_emailSettings.SmtpHost, _emailSettings.SmtpPort, SecureSocketOptions.StartTls);
+            await smtpClient.AuthenticateAsync(_emailSettings.Sender, _emailSettings.Password);
+            await smtpClient.SendAsync(message);
+            await smtpClient.DisconnectAsync(true);
+        }
+
         private string GenerateActivationEmailBody(string activationLink, string userName = "")
         {
             return $@"
@@ -69,13 +78,13 @@ namespace Services.Services.Implement
         <div style='background-color: #ffffff; padding: 40px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
             <div style='text-align: center; margin-bottom: 30px;'>
                 <!-- Logo shop bán Pokemon card -->
-                <img src={{logoUrl}} alt='Pokemon Card Shop Logo' style='max-width: 150px;'>
+                <img src={logoUrl} alt='Pokemon Card Shop Logo' style='max-width: 150px;'>
             </div>
             
             <h1 style='color: #333333; font-size: 24px; margin-bottom: 20px; text-align: center;'>Chào mừng bạn đến với Pokemon Card Shop!</h1>
             
             <p style='color: #666666; font-size: 16px; margin-bottom: 20px;'>
-                                 ""Xin chào khách hàng mới"" 
+                        {(string.IsNullOrEmpty(userName) ? "Xin chào học viên mới" : $"Xin chào {userName},")}
             </p>
             
             <p style='color: #666666; font-size: 16px; margin-bottom: 20px;'>
@@ -83,7 +92,7 @@ namespace Services.Services.Implement
             </p>
             
             <div style='text-align: center; margin-bottom: 30px;'>
-                <a href='{{activationLink}}' 
+                <a href='{activationLink}' 
                    style='display: inline-block; padding: 15px 30px; background-color: #ffcb05; color: #3b4cca; text-decoration: none; border-radius: 5px; font-size: 16px; font-weight: bold; text-transform: uppercase; transition: background-color 0.3s ease;'>
                     Kích hoạt tài khoản
                 </a>
@@ -105,7 +114,7 @@ namespace Services.Services.Implement
             </p>
             
             <p style='color: #666666; font-size: 14px; margin-bottom: 30px; word-break: break-all;'>
-                {{activationLink}}
+                {activationLink}
             </p>
             
             <div style='border-top: 1px solid #eeeeee; padding-top: 20px; margin-top: 20px;'>
@@ -134,15 +143,6 @@ namespace Services.Services.Implement
 
 ;
 
-        }
-
-        private async Task ConnectAndSendEmailAsync(MailKit.Net.Smtp.SmtpClient smtpClient, MimeMessage message)
-        {
-            // Use configuration values from appsettings.json
-            await smtpClient.ConnectAsync(_emailSettings.SmtpHost, _emailSettings.SmtpPort, SecureSocketOptions.StartTls);
-            await smtpClient.AuthenticateAsync(_emailSettings.Sender, _emailSettings.Password);
-            await smtpClient.SendAsync(message);
-            await smtpClient.DisconnectAsync(true);
         }
     }
 }
