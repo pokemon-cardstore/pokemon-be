@@ -105,7 +105,7 @@ namespace Services.Services.Implement
                     Email = email,
                     Name = name,
                     Avatar = avatarUrl,
-                    HashedPassword = null,
+                    HashedPassword = "",
                     Status = 1
                 };
 
