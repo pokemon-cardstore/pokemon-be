@@ -18,6 +18,7 @@ namespace Repository.UnitOfWork.Interface
         IGenericRepository<Customer> CustomerRepository { get; }
         IGenericRepository<Order> OrderRepository { get; }
         IGenericRepository<OrderDetail> OrderDetailRepository { get; }
+        IGenericRepository<Customer> Customer { get; }
 
         IGenericRepository<Product> ProductRepository { get; }
         IGenericRepository<ProductImage> ProductImageRepository { get; }
@@ -25,5 +26,8 @@ namespace Repository.UnitOfWork.Interface
         public CartRepository cartRepository { get; }
         Task<IDbContextTransaction> BeginTransactionAsync();
         Task SaveAsync();
+
+        Task<bool> SaveChangeAsync();
+
     }
 }
