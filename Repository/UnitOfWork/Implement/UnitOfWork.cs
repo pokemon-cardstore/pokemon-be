@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Repository.Models;
 using Repository.Repository.Implement;
 using Repository.Repository.Interface;
@@ -37,6 +38,8 @@ namespace Repository.UnitOfWork.Implement
 
         public IGenericRepository<Customer> CustomerRepository => _customerRepository ?? new GenericRepository<Customer>(context);
 
+        public IGenericRepository<Customer> Customer =>  _customerRepository ??= new GenericRepository<Customer>(context);
+
         public IGenericRepository<Order> OrderRepository => _orderRepository ?? new GenericRepository<Order>(context);
 
         public IGenericRepository<OrderDetail> OrderDetailRepository => _orderDetailRepository ?? new GenericRepository<OrderDetail>(context);
@@ -60,6 +63,7 @@ namespace Repository.UnitOfWork.Implement
                 return _cartRepository;
             }
         }
+
 
         protected virtual void Dispose(bool disposing)
         {
@@ -86,6 +90,11 @@ namespace Repository.UnitOfWork.Implement
         public async Task<IDbContextTransaction> BeginTransactionAsync()
         {
             return await context.Database.BeginTransactionAsync();
+        }
+
+        public async Task<bool> SaveChangeAsync()
+        {
+            return await context.SaveChangesAsync() > 0;
         }
     }
 }
