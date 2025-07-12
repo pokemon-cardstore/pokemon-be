@@ -18,7 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Cấu hình Kestrel để lắng nghe tất cả IP
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.ListenAnyIP(5275); // Port có thể thay đổi
+    options.ListenAnyIP(8080); // Port có thể thay đổi
 });
 
 builder.Services.AddControllers();
@@ -97,13 +97,13 @@ builder.Services.AddAutoMapper(typeof(Program), typeof(Mapping));
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
+// if (app.Environment.IsDevelopment())
+// {
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+// }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
