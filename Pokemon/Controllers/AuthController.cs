@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.ModelView;
 using Services.Services.Interface;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace Pokemon.Controllers
 {
@@ -21,38 +19,49 @@ namespace Pokemon.Controllers
             _configuration = configuration;
         }
 
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Authenticate(string email, string password)
         {
             try
             {
-                if (string.IsNullOrEmpty(email)) {
+                if (string.IsNullOrEmpty(email))
+                {
                     return BadRequest("Email cannot be empty");
                 }
-                if (string.IsNullOrEmpty(password)) { 
+                if (string.IsNullOrEmpty(password))
+                {
                     return BadRequest("Password cannot be empty");
                 }
+
                 IActionResult response = Unauthorized();
-                IConfiguration configuration = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", optional: true, reloadOnChange: true).Build();
+
+                IConfiguration configuration = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                    .Build();
+
                 string AdminEmail = configuration["Account:AdminAccount:email"];
                 string AdminPassword = configuration["Account:AdminAccount:password"];
-                var hashedPassword = await HashPassword(password);
-                if (AdminEmail.Equals(email) && AdminPassword.Equals(hashedPassword))
+
+                // So sánh trực tiếp không hash nữa
+                if (AdminEmail.Equals(email) && AdminPassword.Equals(password))
                 {
                     var accessToken = await _authService.GenerateAccessTokenForAdmin();
-                    response = Ok(new { accessToken = accessToken });
-                    return response;
+                    return Ok(new { accessToken });
                 }
-                var customer = await _authService.AuthenticateCustomer(email, hashedPassword);
+
+                // Gọi service với password plain
+                var customer = await _authService.AuthenticateCustomer(email, password);
                 if (customer != null)
                 {
                     var accessToken = await _authService.GenerateAccessTokenForCustomer(customer);
-                    response = Ok(new { accessToken = accessToken });
-                    return response;
+                    return Ok(new { accessToken });
                 }
+
                 return NotFound("Invalid email or password");
             }
-            catch (Exception ex) { 
+            catch (Exception ex)
+            {
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
@@ -88,29 +97,6 @@ namespace Pokemon.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Google login failed: {ex.Message}");
-            }
-        }
-
-        private async Task<string> HashPassword(string password)
-        {
-            try
-            {
-                using (SHA512 sha512 = SHA512.Create())
-                {
-                    byte[] hashBytes = sha512.ComputeHash(Encoding.UTF8.GetBytes(password));
-
-                    StringBuilder stringBuilder = new StringBuilder();
-                    for (int i = 0; i < hashBytes.Length; i++)
-                    {
-                        stringBuilder.Append(hashBytes[i].ToString("x2"));
-                    }
-
-                    return await Task.FromResult(stringBuilder.ToString());
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
             }
         }
     }
