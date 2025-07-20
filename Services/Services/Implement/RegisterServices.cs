@@ -46,16 +46,13 @@ namespace Services.Services.Implement
             if (existingCustomer != null)
                 return new ResponseDTO("Email already registered.", 409);
 
-            // Băm mật khẩu
-            var hashedPassword = PasswordHasher.Hash(register.PassWord!);
-
-            // Tạo đối tượng Customer mới
+            // KHÔNG băm mật khẩu, lưu trực tiếp
             var customer = new Customer
             {
                 Name = register.UserName,
                 Email = register.Email!,
-                HashedPassword = hashedPassword,
-                Status = 0, 
+                HashedPassword = register.PassWord,  // Lưu mật khẩu nguyên bản (không khuyến khích trong production)
+                Status = 0,
             };
 
             // Lưu vào database
@@ -64,6 +61,7 @@ namespace Services.Services.Implement
 
             return new ResponseDTO("Sign up successfully", 200, true);
         }
+
     }
 
 

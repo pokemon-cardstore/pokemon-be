@@ -24,17 +24,15 @@ namespace Services.Services.Implement
             _configuration = configuration;
         }
 
-        public async Task<Customer?> AuthenticateCustomer(string email, string hashedPassword)
+        // ⚠️ Không còn hashedPassword nữa
+        public async Task<Customer?> AuthenticateCustomer(string email, string password)
         {
             try
             {
-                var customer = (await _unitOfWork.CustomerRepository.FindAsync(a => a.HashedPassword == hashedPassword && a.Email == email)).FirstOrDefault();
-                if (customer == null) {
-                    return null;
-                } else
-                {
-                    return customer;
-                }
+                var customer = (await _unitOfWork.CustomerRepository.FindAsync(
+                    a => a.Email == email && a.HashedPassword == password)).FirstOrDefault();
+
+                return customer;
             }
             catch (Exception ex)
             {
@@ -54,9 +52,10 @@ namespace Services.Services.Implement
                     new Claim("Role", "CUSTOMER")
                 };
                 var accessExpiration = DateTime.Now.AddMinutes(30);
-                var accessJwt = new JwtSecurityToken(_configuration["Jwt:Issuer"], _configuration["Jwt:Audience"], accessClaims, expires: accessExpiration, signingCredentials: credentials);
-                var accessToken = new JwtSecurityTokenHandler().WriteToken(accessJwt);
-                return accessToken;
+                var accessJwt = new JwtSecurityToken(_configuration["Jwt:Issuer"], _configuration["Jwt:Audience"],
+                    accessClaims, expires: accessExpiration, signingCredentials: credentials);
+
+                return new JwtSecurityTokenHandler().WriteToken(accessJwt);
             }
             catch (Exception ex)
             {
@@ -75,27 +74,29 @@ namespace Services.Services.Implement
                     new Claim("Role", "ADMIN")
                 };
                 var accessExpiration = DateTime.Now.AddMinutes(30);
-                var accessJwt = new JwtSecurityToken(_configuration["Jwt:Issuer"], _configuration["Jwt:Audience"], accessClaims, expires: accessExpiration, signingCredentials: credentials);
-                var accessToken = new JwtSecurityTokenHandler().WriteToken(accessJwt);
-                return accessToken;
+                var accessJwt = new JwtSecurityToken(_configuration["Jwt:Issuer"], _configuration["Jwt:Audience"],
+                    accessClaims, expires: accessExpiration, signingCredentials: credentials);
+
+                return new JwtSecurityTokenHandler().WriteToken(accessJwt);
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
         }
+
         public async Task<Customer> GetCustomerByEmail(string email)
         {
             try
             {
-                var customer = (await _unitOfWork.CustomerRepository.FindAsync(c => c.Email == email)).FirstOrDefault();
-                return customer;
+                return (await _unitOfWork.CustomerRepository.FindAsync(c => c.Email == email)).FirstOrDefault();
             }
             catch (Exception ex)
             {
                 throw new Exception($"Error fetching customer by email: {ex.Message}");
             }
         }
+
         public async Task<Customer> CreateCustomerFromGoogle(string email, string name, string avatarUrl)
         {
             try
@@ -105,7 +106,7 @@ namespace Services.Services.Implement
                     Email = email,
                     Name = name,
                     Avatar = avatarUrl,
-                    HashedPassword = "",
+                    HashedPassword = "", // có thể giữ nguyên
                     Status = 1
                 };
 
@@ -119,7 +120,5 @@ namespace Services.Services.Implement
                 throw new Exception($"Error creating customer from Google: {ex.Message}");
             }
         }
-
-
     }
 }
