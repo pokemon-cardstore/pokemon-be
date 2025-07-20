@@ -12,8 +12,8 @@ using Repository.Models;
 namespace Repository.Migrations
 {
     [DbContext(typeof(PokemonDbContext))]
-    [Migration("20250627133022_hash")]
-    partial class hash
+    [Migration("20250712200924_Test")]
+    partial class Test
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
