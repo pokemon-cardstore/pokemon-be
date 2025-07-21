@@ -19,7 +19,7 @@ namespace Pokemon.Controllers
             _configuration = configuration;
         }
 
-        [HttpGet]
+        [HttpPost]
         public async Task<IActionResult> Authenticate(string email, string password)
         {
             try
